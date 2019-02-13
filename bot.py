@@ -8,6 +8,12 @@ import time
 from time import sleep
 from telebot import apihelper
 
+logfile = open('daemon.log', 'w')
+
+context = daemon.DaemonContext(stdout = logfile, stderr = logfile)
+
+context.open()
+
 apihelper.proxy = {'https':'socks5://localhost:9050'}
 
 bot = telebot.TeleBot(config.token)
@@ -40,9 +46,9 @@ def sendbot(msg):
         pass
     pass
 
+
 if __name__ == '__main__':
-    # bot.polling(none_stop=True)
-    i = 0;
+    
     while True:
         try:
             check_email()
