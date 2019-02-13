@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+token = 'token '
+
+CHANNEL_NAME = 'chat_id'   
+
+IMAP_SERVER = 'server'
+IMAP_PORT = port
+IMAP_LOGIN = 'login@login.com'
+IMAP_PASSWORD = 'PassWORD'
