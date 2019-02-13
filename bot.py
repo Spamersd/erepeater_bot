@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
-import config
-import logging
+import config #add config.py file in current directory 
 import telebot
 import imaplib
 import email
 import time
+
 from time import sleep
 from telebot import apihelper
-
-logfile = open('daemon.log', 'w')
-
-context = daemon.DaemonContext(stdout = logfile, stderr = logfile)
-
-context.open()
 
 apihelper.proxy = {'https':'socks5://localhost:9050'}
 
@@ -38,8 +32,9 @@ def check_email():
     pass
 
 def sendbot(msg):
+    
     try:
-        bot.send_message(CHANNEL_NAME, msg)
+        bot.send_message(config.CHANNEL_NAME, msg)
         pass
     except:
         print("Ошибка отправки собщения ботом")
@@ -48,7 +43,6 @@ def sendbot(msg):
 
 
 if __name__ == '__main__':
-    
     while True:
         try:
             check_email()
