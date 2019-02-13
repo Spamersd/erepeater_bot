@@ -23,8 +23,9 @@ def check_email():
         typ, data = imap.fetch(num, "(RFC822)") 
         msg = email.message_from_bytes(data[0][1], _class = email.message.EmailMessage)
         payload = msg.get_payload()
-        imap.store(num, '+FLAGS', '\\Deleted')
-        sendbot(payload)  
+        if sendbot(payload):
+            imap.store(num, '+FLAGS', '\\Deleted')
+            pass     
 
     imap.expunge()             
     imap.close() 
@@ -32,17 +33,20 @@ def check_email():
     pass
 
 def sendbot(msg):
-    
+    result = True
     try:
         bot.send_message(config.CHANNEL_NAME, msg)
         pass
     except:
         print("Ошибка отправки собщения ботом")
+        result = False
         pass
+    return result
     pass
 
 
 if __name__ == '__main__':
+    print('Bot is started!')
     while True:
         try:
             check_email()
