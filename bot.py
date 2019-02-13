@@ -34,6 +34,8 @@ def check_email():
 
 def sendbot(msg):
     result = True
+    # bot.send_message(config.CHANNEL_NAME, msg)
+
     try:
         bot.send_message(config.CHANNEL_NAME, msg)
         pass
