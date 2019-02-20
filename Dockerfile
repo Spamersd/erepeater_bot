@@ -18,7 +18,7 @@ RUN pip3 install --upgrade pip \
 
 RUN curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/bot.py; \
     curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/entrypoint.sh;    
-COPY ./config1.py  ./config1.py
+COPY ./config.py  ./config.py
 
 CMD ["./entrypoint.sh"]
 
