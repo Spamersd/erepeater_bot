@@ -118,6 +118,6 @@ if __name__ == '__main__':
             check_email()
         except:
             sendbot("Ошибка проверки почты!")
-        time.sleep(60)
+        time.sleep(300)
         pass
 
