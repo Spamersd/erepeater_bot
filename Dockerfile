@@ -16,9 +16,24 @@ RUN pip3 install --upgrade pip \
       requests \
       PySocks;
 
+ARG token
+ARG CHANNEL_NAME
+ARG IMAP_SERVER
+ARG IMAP_PORT
+ARG IMAP_LOGIN
+ARG IMAP_PASSWORD
+
+RUN echo ${token}>>/config.py; \
+    echo ${CHANNEL_NAME}>>config.py; \
+    echo ${IMAP_SERVER}>>config; \
+    echo ${IMAP_PORT}>>config; \ 
+    echo ${IMAP_LOGIN}>>config; \ 
+    echo ${IMAP_PASSWORD}>>config;  
+
+
 RUN curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/bot.py; \
     curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/entrypoint.sh;    
-COPY ./config.py  ./config.py
+# COPY ./config.py  ./config.py
 
 CMD ["./entrypoint.sh"]
 
