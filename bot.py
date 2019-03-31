@@ -71,7 +71,6 @@ def getBody(msg):
             body = ""
             for payload in msg.get_payload():
                 body = body + getBody(payload)
-
         else:
             charset = msg._charset
             if charset is None:
