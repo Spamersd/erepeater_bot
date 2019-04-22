@@ -30,47 +30,41 @@ def check_email():
         message = parse_message(data)
 
         if sendbot(message):
-            imap.store(num, '+FLAGS', '\\Deleted')
-            pass     
+            pass
+           # imap.store(num, '+FLAGS', '\\Deleted')    
 
     imap.expunge()             
     imap.close() 
     imap.logout() 
-    pass
 
 def parse_message(data):
 
-    msg = email.message_from_bytes(data[0][1],
-     _class = email.message.EmailMessage)
+    msg = email.message_from_bytes(data[0][1],_class = email.message.EmailMessage)
 
     msg_date = msg.get('Date')
-    msg_from = getHeader(msg,'From')
-    msg_subject = getHeader(msg,'Subject')
-    msg_body = getBody(msg)
+    msg_from = get_header(msg,'From')
+    msg_subject = get_header(msg,'Subject')
+    msg_body = get_body(msg)
     msg = cut_message(msg_date + '\n' + msg_from +'\n' + msg_subject +'\n'+ msg_body)
     
     return msg
-    pass
 
 def cut_message (msg):
+    
     while "  " in msg:
         msg= msg.replace("  ", " ")
 
     msg = msg.expandtabs(1)
     msg = msg.strip()
-    if len(msg) > 500:
-        msg = msg[0:500]
+    msg = msg[:500]
 
     return msg
-    pass
-
-def getBody(msg):
-    """ Extract content body of an email messsage """
+ 
+def get_body(msg):
+    
     try:
         if msg.is_multipart():
-            body = ""
-            for payload in msg.get_payload():
-                body = body + getBody(payload)
+            body = ''.join([get_body(payload) for payload in msg.get_payload()])
 
         else:
             charset = msg._charset
@@ -79,15 +73,14 @@ def getBody(msg):
             body = msg.get_payload(decode=True).decode(charset)
             soup = BeautifulSoup(body)
             return soup.get_text()  
-        pass
+    
     except Exception as e:
-        body = "Ошибка обработки тела письма" + str(e)
+        body = f"Error processing body\nError: {str(e)}"
         logging.error(body)
-        pass
     
     return body
 
-def getHeader(Message,Attribute):
+def get_header(Message,Attribute):
     
     text = ""
     
@@ -101,35 +94,24 @@ def getHeader(Message,Attribute):
 
             if str_encoding is None : 
                 str_encoding = "utf-8"
-                pass
             if isinstance(str_text,bytes):
                 text = text + str_text.decode(str_encoding)
-                pass
             elif  isinstance(str_text,str):
-                text = text + str_text                
                 pass
-            pass
 
-        pass
     except Exception as e:
-        pass   
-    
+        pass
     return text
-    pass
 
 def sendbot(msg):
     
-    result = True
-
     try:
         bot.send_message(config.CHANNEL_NAME, msg)
-        pass
     except Exception as e:
-        logging.error("Error send message from bot" + str(e))
-        result = False
-        pass
-    return result
-    pass
+        logging.error(f"Error send message from bot {str(e)}")
+        return False
+    else:
+        return True
 
 if __name__ == '__main__':
 
@@ -139,8 +121,8 @@ if __name__ == '__main__':
         try:
             check_email()
         except Exception as e:
-            sendbot("Ошибка проверки почты!\n"+"Ошибка: "+str(e))
-            logging.error("Error check email: "+ str(e))
+            sendbot(f"Error check email!\nError: {str(e)}")
+            logging.error(f"Error check email: {str(e)}")
         time.sleep(300)
-        pass
+
 
