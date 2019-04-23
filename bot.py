@@ -18,6 +18,19 @@ logging.basicConfig(filename="bot.log", level=logging.INFO, format=FORMAT)
 
 bot = telebot.TeleBot(config.token)
 
+class ImapHendler:
+    
+    config = None
+    imap =None
+    
+    def __init__(self,config):
+        self.config = config
+        self.imap = imaplib.IMAP4(config.IMAP_SERVER,config.IMAP_PORT)
+        super().__init__()
+    
+    def connect(self):
+        self.imap.login(self.config.IMAP_LOGIN,self.config)
+
 def check_email():
 
     imap = imaplib.IMAP4(config.IMAP_SERVER,config.IMAP_PORT)
@@ -29,7 +42,7 @@ def check_email():
         typ, data = imap.fetch(num, "(RFC822)") 
         message = parse_message(data)
 
-        if sendbot(message):
+        if send_bot(message):
             pass
            # imap.store(num, '+FLAGS', '\\Deleted')    
 
@@ -103,7 +116,7 @@ def get_header(Message,Attribute):
         pass
     return text
 
-def sendbot(msg):
+def send_bot(msg):
     
     try:
         bot.send_message(config.CHANNEL_NAME, msg)
@@ -121,7 +134,7 @@ if __name__ == '__main__':
         try:
             check_email()
         except Exception as e:
-            sendbot(f"Error check email!\nError: {str(e)}")
+            send_bot(f"Error check email!\nError: {str(e)}")
             logging.error(f"Error check email: {str(e)}")
         time.sleep(300)
 
