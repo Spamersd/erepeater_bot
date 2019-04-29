@@ -1,4 +1,4 @@
-Boat telegram
+Bot telegram
 =====================
 
 Description
