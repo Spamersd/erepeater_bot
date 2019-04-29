@@ -29,26 +29,36 @@ class ImapHendler:
         super().__init__()
     
     def connect(self):
-        self.imap.login(self.config.IMAP_LOGIN,self.config)
+        try:
+            self.imap.login(self.config.IMAP_LOGIN,self.config.IMAP_PASSWORD)      
+        except Exception as e:
+            logging.error(f"Error: {(e)}")
 
-def check_email():
+    def check_email(self):
 
-    imap = imaplib.IMAP4(config.IMAP_SERVER,config.IMAP_PORT)
-    imap.login(config.IMAP_LOGIN,config.IMAP_PASSWORD)
-    imap.select()
-    typ, mails = imap.search(None, 'ALL') 
+        self.imap.select()
+        typ, mails = self.imap.search(None, 'ALL') 
 
-    for num in mails[0].split(): 
-        typ, data = imap.fetch(num, "(RFC822)") 
-        message = parse_message(data)
+        for num in mails[0].split(): 
+            typ, data = self.imap.fetch(num, "(RFC822)") 
+            message = parse_message(data)
 
-        if send_bot(message):
-            pass
-           # imap.store(num, '+FLAGS', '\\Deleted')    
+            if send_bot(message):
+                pass
+            # imap.store(num, '+FLAGS', '\\Deleted')    
 
-    imap.expunge()             
-    imap.close() 
-    imap.logout() 
+        self.imap.expunge() 
+
+    def state(self):
+        return self.imap.state
+
+    def close(self):
+        self.imap.close()
+    
+    def logout(self):
+        self.imap.logout()
+
+         
 
 def parse_message(data):
 
@@ -113,6 +123,7 @@ def get_header(Message,Attribute):
                 pass
 
     except Exception as e:
+        logging.error(f"Error:{(e)}")
         pass
     return text
 
@@ -129,13 +140,19 @@ def send_bot(msg):
 if __name__ == '__main__':
 
     logging.info("Bot was started")
-
+    ImapSession = ImapHendler(config)
+    ImapSession.connect()
     while True:
         try:
-            check_email()
+            if ImapSession.state() == 'AUTH':
+                ImapSession.check_email()
+            else:
+                ImapSession.connect()
+                ImapSession.check_email()
         except Exception as e:
             send_bot(f"Error check email!\nError: {str(e)}")
             logging.error(f"Error check email: {str(e)}")
         time.sleep(300)
-
-
+    
+    ImapSession.close() 
+    ImapSession.logout()
