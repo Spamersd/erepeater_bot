@@ -1,2 +1,3 @@
-echo "nameserver 192.168.1.3" > /etc/resolv.conf    
+#/bin/bash
+echo "nameserver 8.8.8.8" > /etc/resolv.conf    
 tor & python3 bot.py

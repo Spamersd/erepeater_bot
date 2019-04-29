@@ -16,7 +16,7 @@ FORMAT = "%(asctime)s;%(levelname)s;%(message)s"
 
 logging.basicConfig(filename="bot.log", level=logging.INFO, format=FORMAT)
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(config.TOKEN)
 
 class ImapHendler:
     
@@ -56,9 +56,7 @@ class ImapHendler:
         self.imap.close()
     
     def logout(self):
-        self.imap.logout()
-
-         
+        self.imap.logout()     
 
 def parse_message(data):
 
@@ -142,6 +140,7 @@ if __name__ == '__main__':
     logging.info("Bot was started")
     ImapSession = ImapHendler(config)
     ImapSession.connect()
+
     while True:
         try:
             if ImapSession.state() == 'AUTH':
@@ -150,8 +149,8 @@ if __name__ == '__main__':
                 ImapSession.connect()
                 ImapSession.check_email()
         except Exception as e:
-            send_bot(f"Error check email!\nError: {str(e)}")
             logging.error(f"Error check email: {str(e)}")
+    
         time.sleep(300)
     
     ImapSession.close() 
