@@ -1,4 +1,4 @@
-Bot telegram
+Telegram bot
 =====================
 
 Description
