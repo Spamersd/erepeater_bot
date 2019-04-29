@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import config #add config.py file in current directory 
 import telebot
 import imaplib
 import email
@@ -9,6 +8,8 @@ import logging
 from time import sleep
 from telebot import apihelper
 from bs4 import BeautifulSoup
+
+import config #add config.py file in current directory 
 
 apihelper.proxy = {'https':'socks5://localhost:9050'}
 
@@ -21,6 +22,7 @@ bot = telebot.TeleBot(config.TOKEN)
 class ImapHendler:
     
     config = None
+
     imap =None
     
     def __init__(self,config):
@@ -30,7 +32,7 @@ class ImapHendler:
     
     def connect(self):
         try:
-            self.imap.login(self.config.IMAP_LOGIN,self.config.IMAP_PASSWORD)      
+            self.imap.login(self.config.IMAP_LOGIN,self.config.IMAP_PASSWORD)     
         except Exception as e:
             logging.error(f"Error: {(e)}")
 
@@ -44,8 +46,7 @@ class ImapHendler:
             message = parse_message(data)
 
             if send_bot(message):
-                pass
-            # imap.store(num, '+FLAGS', '\\Deleted')    
+                imap.store(num, '+FLAGS', '\\Deleted')    
 
         self.imap.expunge() 
 
@@ -60,13 +61,15 @@ class ImapHendler:
 
 def parse_message(data):
 
-    msg = email.message_from_bytes(data[0][1],_class = email.message.EmailMessage)
+    msg = email.message_from_bytes(data[0][1], \
+    _class = email.message.EmailMessage)
 
     msg_date = msg.get('Date')
     msg_from = get_header(msg,'From')
     msg_subject = get_header(msg,'Subject')
     msg_body = get_body(msg)
-    msg = cut_message(msg_date + '\n' + msg_from +'\n' + msg_subject +'\n'+ msg_body)
+    msg = cut_message(msg_date + '\n' + \
+        msg_from +'\n' + msg_subject +'\n'+ msg_body)
     
     return msg
 
@@ -85,7 +88,8 @@ def get_body(msg):
     
     try:
         if msg.is_multipart():
-            body = ''.join([get_body(payload) for payload in msg.get_payload()])
+            body = ''.join([get_body(payload) \
+                for payload in msg.get_payload()])
 
         else:
             charset = msg._charset
