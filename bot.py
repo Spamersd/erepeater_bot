@@ -67,7 +67,7 @@ def parse_message(data):
     msg_date = msg.get('Date')
     msg_from = get_header(msg,'From')
     msg_subject = get_header(msg,'Subject')
-    msg_body = get_body(msg)
+    msg_body = extract_body(msg)
     msg = cut_message(msg_date + '\n' + \
         msg_from +'\n' + msg_subject +'\n'+ msg_body)
     
@@ -92,10 +92,11 @@ def get_body(msg):
                 for payload in msg.get_payload()])
 
         else:
-            charset = msg._charset
-            if charset is None:
-                charset = 'utf-8' 
-            body = msg.get_payload(decode=True).decode(charset)
+            if msg._charset is None:
+                body = msg.get_payload(decode=True).decode()
+            else:
+                body = msg.get_payload(decode=True).decode(msg._charset) 
+           
             soup = BeautifulSoup(body)
             return soup.get_text()  
     
@@ -104,6 +105,49 @@ def get_body(msg):
         logging.error(body)
     
     return body
+
+def extract_body(msg, depth=0):
+    try:
+        """ Extract content body of an email messsage """
+        body = []
+        if msg.is_multipart():
+            main_content = None
+            # multi-part emails often have both
+            # a text/plain and a text/html part.
+            # Use the first `text/plain` part if there is one,
+            # otherwise take the first `text/*` part.
+            for part in msg.get_payload():
+                is_txt = part.get_content_type() == 'text/plain'
+                if not main_content or is_txt:
+                    main_content = extract_body(part)
+                if is_txt:
+                    break
+            if main_content:
+                body.extend(main_content)
+        elif msg.get_content_type().startswith("text/"):
+            # Get the messages
+            charset = msg.get_param('charset', 'utf-8').lower()
+            # update charset aliases
+            charset = email.charset.ALIASES.get(charset, charset)
+            msg.set_param('charset', charset)
+            try:
+                body.append(msg.get_content())
+            except AssertionError as e:
+                print('Parsing failed.    ')
+                print(e)
+            except LookupError:
+                # set all unknown encoding to utf-8
+                # then add a header to indicate this might be a spam
+                msg.set_param('charset', 'utf-8')
+                body.append('=== <UNKOWN ENCODING POSSIBLY SPAM> ===')
+                body.append(msg.get_content())
+        return body
+    except Exception as e:
+        body = f"Error processing body\nError: {str(e)}"
+        logging.error(body)
+    
+    return body
+
 
 def get_header(Message,Attribute):
     
@@ -155,7 +199,7 @@ if __name__ == '__main__':
         except Exception as e:
             logging.error(f"Error check email: {str(e)}")
     
-        time.sleep(300)
+        #time.sleep(300)
     
     ImapSession.close() 
     ImapSession.logout()

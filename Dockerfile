@@ -24,12 +24,13 @@ ARG IMAP_LOGIN
 ARG IMAP_PASSWORD
 
 RUN echo "# -*- coding: utf-8 -*-">>config.py; \
-    echo "token="${token}>>config.py; \
+    echo "TOKEN="${token}>>config.py; \
     echo "CHANNEL_NAME="${CHANNEL_NAME}>>config.py; \
     echo "IMAP_SERVER="${IMAP_SERVER}>>config.py; \
     echo "IMAP_PORT="${IMAP_PORT}>>config.py; \ 
     echo "IMAP_LOGIN="${IMAP_LOGIN}>>config.py; \ 
-    echo "IMAP_PASSWORD="${IMAP_PASSWORD}>>config.py;  
+    echo "IMAP_PASSWORD="${IMAP_PASSWORD}>>config.py;\
+    echo "nameserver 8.8.8.8" > /etc/resolv.conf;    
 
 
 RUN curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/bot.py; \
