@@ -30,7 +30,7 @@ RUN echo "# -*- coding: utf-8 -*-">>config.py; \
     echo "IMAP_PORT="${IMAP_PORT}>>config.py; \ 
     echo "IMAP_LOGIN="${IMAP_LOGIN}>>config.py; \ 
     echo "IMAP_PASSWORD="${IMAP_PASSWORD}>>config.py;\
-    echo "nameserver 8.8.8.8" > /etc/resolv.conf;    
+    echo "nameserver "${DNS_SERVER} > /etc/resolv.conf;    
 
 
 RUN curl -O https://raw.githubusercontent.com/Spamersd/erepeater_bot/master/bot.py; \
